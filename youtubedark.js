@@ -1,12 +1,19 @@
 var htmlTag = document.getElementsByTagName("html")[0];
 htmlTag.setAttribute("dark", "true");
 
-// attaching a listener to page load didn't seem to work for some reason - so doing it the lazy way
-var execute = function () {
- htmlTag.setAttribute("dark", "true");
- setTimeout(execute, 1000);
-};
+// Now do it the proper way - listen for changes in the DOM with MutationObserver
 
-// Incase it removes it for some reason - it seems to do this on large vids
-setTimeout(execute, 1000);
+// Options for the observer (which mutations to observe)
+const config = { attributeFilter: ["dark"]};
 
+const callback = function(mutationsList, observer) {
+	if (!htmlTag.hasAttribute("dark")) {	// you absolutely need this if statement, utterly kills performance otherwise
+		htmlTag.setAttribute("dark", "true");
+	}	
+}
+
+// Create an observer instance linked to the callback function
+const observer = new MutationObserver(callback);
+
+// Start observing the target node for configured mutations
+observer.observe(htmlTag, config);
